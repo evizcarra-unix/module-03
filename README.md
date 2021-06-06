@@ -2,15 +2,15 @@
 
 This program is in some way a ticket system through the use of an SQL database and C++. At the moment, it focuses on the front-end of managing the client's (customer's) info and an event being triggered. When initializing the program, the User or employee is displayed a menu:
 
-* 1. New Instance (Event)
-* 2. Show Customers
-* 3. Edit Customer
-* 4. Find Customer
-* 5. Delete Customer
-* 6. Add Event
-* 7. Delete Event
-* 8. Edit Event
-* 9. Exit
+1. New Instance (Event)
+2. Show Customers
+3. Edit Customer
+4. Find Customer
+5. Delete Customer
+6. Add Event
+7. Delete Event
+8. Edit Event
+9. Exit
 
 Every option provides its own use of instructions. It's a simple program with the sole purpose of managing events and customer info; such as "Failed RAM stick" or "Dead Pixels on LCD".
 
