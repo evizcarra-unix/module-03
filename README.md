@@ -14,7 +14,7 @@ This program is in some way a ticket system through the use of an SQL database a
 
 Every option provides its own use of instructions. It's a simple program with the sole purpose of managing events and customer info; such as "Failed RAM stick" or "Dead Pixels on LCD".
 
-[Software Demo Video](http://youtube.link.goes.here)
+[Software Demo Video](https://youtu.be/UPhMH1D5rwY)
 
 # Development Environment
 
