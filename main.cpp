@@ -131,7 +131,7 @@ void New_Event() {
     getline(cin, customer_eventDate);
     printf("---------------------------------------------------------\n");
     printf("SQL DATABASE NOT FOUND");
-    printf("---------------------------------------------------------\n");
+    printf("\n---------------------------------------------------------\n");
     
     cout << "Enter Event ID: ";
     getline(cin, customer_eventID);
@@ -223,7 +223,7 @@ void Edit_Customer() {
 
     printf("---------------------------------------------------------\n");
     printf("SQL DATABASE NOT FOUND");
-    printf("---------------------------------------------------------\n");
+    printf("\n---------------------------------------------------------\n");
 
     try {
         cout << endl;
@@ -295,7 +295,7 @@ void Find_Customer() {
 
     printf("---------------------------------------------------------\n");
     printf("SQL DATABASE NOT FOUND");
-    printf("---------------------------------------------------------\n");
+    printf("\n---------------------------------------------------------\n");
 
     ExitMenu:
     cout << "Type 'm' for Main Menu and 'a' to Search again. Press any other key to EXIT: ";
@@ -329,7 +329,7 @@ void Delete_Customer() {
 
     printf("---------------------------------------------------------\n");
     printf("SQL DATABASE NOT FOUND");
-    printf("---------------------------------------------------------\n");
+    printf("\n---------------------------------------------------------\n");
 
     try {
         cout << endl;
@@ -401,7 +401,7 @@ void Add_Event() {
 
     printf("---------------------------------------------------------\n");
     printf("SQL DATABASE NOT FOUND");
-    printf("---------------------------------------------------------\n");
+    printf("\n---------------------------------------------------------\n");
 
     cout << "Type 'm' for Main Menu and 'a' to Insert Another Event. Press any other key to exit: ";
     cin >> choose;
@@ -503,7 +503,7 @@ void Edit_Event() {
 
     printf("---------------------------------------------------------\n");
     printf("SQL DATABASE NOT FOUND");
-    printf("---------------------------------------------------------\n");
+    printf("\n---------------------------------------------------------\n");
 
     try {
         cout << endl;
