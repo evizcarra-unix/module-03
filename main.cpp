@@ -6,6 +6,7 @@
 #include<sstream>
 #include<conio.h>
 #include<cstdlib>
+#include<mysql.h>
 using namespace std;
 
 //Given Functions
@@ -18,6 +19,11 @@ void Add_Event();
 void Delete_Event();
 void Edit_Event();
 
+//Global
+int conn_state;
+MYSQL* conn;
+MYSQL_ROW row;
+MYSQL_RES* res;
 
 int main() {
     //Load starts
@@ -112,7 +118,7 @@ void New_Event() {
     char choose;
 
     //Variable for storing info
-    string store_userEvent[500][500];
+    string store_userEvent[100][100];
     int store_Index = 0, store_Index2 = 0;
 
     cout << "Management System" << endl << endl;
@@ -199,7 +205,7 @@ void Edit_Customer() {
     string customer_eventID = "";
     string customer_userEvent = "";
     string customer_eventCost = "";
-    string items[5000];
+    string items[500];
     char choose;
     int Item_ID;
     bool Valid_Exception = false;
@@ -215,7 +221,7 @@ void Edit_Customer() {
     string store_eventDate = "";
     string store_Event = "";
     string store_Cost = "";
-    string store_Event2d[500][500];
+    string store_Event2d[100][100];
     int store_Index = 0, store_Index2 = 0;
 
     cout << "Management System: Instances & Cost" << endl << endl;
