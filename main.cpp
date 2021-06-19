@@ -447,7 +447,18 @@ void Edit_Customer() {
             }
 
             string query_update = "update management_system_tb set t_customer_name = '"+customer_name+"', t_customer_address = '"+customer_address+"', t_customer_phone = '"+customer_phone+"', t_customer_email = '"+customer_email+"', t_customer_eventDate = '"+customer_eventDate+"', t_customer_eventID = '"+customer_eventID+"', t_customer_eventCost = '"+customer_eventCost+"', where t_id = '"+str_id+"'";
-        }   
+            const char* qu = query_update.c_str();
+            conn_state = mysql_query(connection, qu);
+
+            if (!conn_state) {
+                cout << endl << "SUCCESS: Database updated." << endl;
+            } else {
+                cout << "FAILED: Couldn't update Database." << mysql_error(connection) << endl;
+            } 
+        }
+        else {
+                cout << "Item NOT FOUND in Database." << endl;
+            }   
     }
 
     ExitMenu:
@@ -480,9 +491,23 @@ void Find_Customer() {
     cout << "Enter Customer's Name: ";
     getline(cin, input);
 
-    printf("---------------------------------------------------------\n");
-    printf("SQL DATABASE NOT FOUND");
-    printf("\n---------------------------------------------------------\n");
+    string query_name = "select * from management_system_tb where t_customer_name like '%"+input+"%'";
+    const char* qn = query_name.c_str();
+    conn_state = mysql_query(connection, qn);
+
+    cout << endl;
+    if (!conn_state)
+    {
+        response = mysql_storing(connection);
+        while ((row = mysql_fetch_row(response)))
+        {
+            cout << "Customer Name: " << row[1] << "\nCustomer Address: " << row[2] << "\nCustomer Phone: " << row[3] << "\nCustomer Email: " << row[4] << "\nEvent Date: " << row[5] << "\nEvent: " << row[6] << "\nInstanceCost: " << row[7] << endl << endl;
+        }
+    }
+    else
+    {
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
+    }
 
     ExitMenu:
     cout << "Type 'm' for Main Menu and 'a' to Search again. Press any other key to EXIT: ";
@@ -507,16 +532,31 @@ void Delete_Customer() {
 
     char choose;
     int Item_ID;
-    string items[5000];
+    string items[100];
     int index_ID = 0;
     bool Valid_Exception = false, Not_Found = false;
 
     cout << "Management System" << endl << endl;
     cout << "Show Customer - Menu" << endl << endl;
 
-    printf("---------------------------------------------------------\n");
-    printf("SQL DATABASE NOT FOUND");
-    printf("\n---------------------------------------------------------\n");
+    conn_state = mysql_query(connection, "select * from management_system_tb");
+    if (!conn_state)
+    {
+        response = mysql_storing(connection);
+        printf("-----------------------------------------------------------------------------------------------------------------\n");
+        printf("| %-10s | %-25s | %-25s | %-40s |\n", "Column ID", "Customer Name", "Event Date", "Event");
+        while ((row = mysql_fetch_row(response)))
+        {
+            printf("| %-10s | %-25s | %-25s | %-40s |\n", row[0], row[1], row[5], row[6]);
+            items[index_ID] = row[0];
+            index_ID++;
+        }
+        printf("-----------------------------------------------------------------------------------------------------------------\n");
+    }
+    else
+    {
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
+    }
 
     try {
         cout << endl;
@@ -532,13 +572,13 @@ void Delete_Customer() {
 
     if (Valid_Exception == false) {
         stringstream streamid;
-        string strid;
+        string str_id;
         streamid << Item_ID;
-        streamid >> strid;
+        streamid >> str_id;
 
         for (int i = 0; i < index_ID; i++)
         {
-            if (strid != items[i])
+            if (str_id != items[i])
             {
                 Not_Found = true;
             }else
@@ -548,12 +588,22 @@ void Delete_Customer() {
             }
         }
 
-        // if (Not_Found == false) {
-        //     break;
-        // }
-        // else {
+        if (Not_Found == false) {
+            string query_delete = "delete from management_system_tb where t_id = '"+str_id+"'";
+            const char* qd = query_delete.c_str();
+            conn_state = mysql_query(connection, qd);
+
+            if (!conn_state)
+            {
+                cout << "SUCCESS: Deleted from Database." << endl;
+            }
+            else {
+                cout << "FAILED TO DELETE" << mysql_error(connection) << endl;
+            }
+        }
+        else {
             cout << "Item NOT FOUND in Database." << endl;
-        // }
+        }
     }
 
     ExitMenu:
@@ -586,9 +636,37 @@ void Add_Event() {
     cout << "Enter Event Name: ";
     getline(cin, event_Name);
 
-    printf("---------------------------------------------------------\n");
-    printf("SQL DATABASE NOT FOUND");
-    printf("\n---------------------------------------------------------\n");
+    string query_insert = "insert into management_system_tb (t_event) values ('"+eventName+"')";
+
+    const char* q = insert_query.c_str(); // c_str converts string to constant char and this is required
+
+    conn_state = mysql_query(connection, q);
+
+    if (!conn_state)
+    {
+        cout << endl << "SUCCESS: Added into Database." << endl;
+    }
+    else
+    {
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
+    }
+
+    conn_state = mysql_query(connection, "select * from management_system_tb");
+    if (!conn_state)
+    {
+        response = mysql_storing(connection);
+        printf("---------------------------------------------------------\n");
+        printf("| %-10s | %-40s |\n", "Event ID", "Event Name");
+        while ((row = mysql_fetch_row(response)))
+        {
+            printf("| %-10s | %-40s |\n", row[0], row[1]);
+        }
+        printf("---------------------------------------------------------\n");
+}
+    else
+    {
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
+    }
 
     cout << "Type 'm' for Main Menu and 'a' to Insert Another Event. Press any other key to exit: ";
     cin >> choose;
@@ -611,12 +689,32 @@ void Delete_Event() {
 
     char choose;
     int Item_ID;
-    string items[5000];
+    string items[100];
     int index_ID = 0;
     bool Valid_Exception = false, Not_Found = false;
 
     cout << "Management System" << endl << endl;
     cout << "Delete Event - Menu" << endl << endl;
+
+    conn_state = mysql_query(connection, "select * from management_system_tb");
+    if (!conn_state)
+    {
+        response = mysql_storing(connection);
+        printf("---------------------------------------------------------\n");
+        printf("| %-10s | %-40s |\n", "Event ID", "Event Name");
+        while ((row = mysql_fetch_row(response)))
+        {
+            printf("| %-10s | %-40s |\n", row[0], row[1]);
+            items[index_ID] = row[0];
+            index_ID++;
+        }
+        printf("---------------------------------------------------------\n");
+    }
+    else
+    {
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
+    }
+
 
     try {
         cout << endl;
@@ -630,13 +728,13 @@ void Delete_Event() {
 
     if (Valid_Exception == false) {
         stringstream streamid;
-        string strid;
+        string str_id;
         streamid << Item_ID;
-        streamid >> strid;
+        streamid >> str_id;
 
         for (int i = 0; i < index_ID; i++)
         {
-            if (strid != items[i])
+            if (str_id != items[i])
             {
                 Not_Found = true;
             }else
@@ -646,12 +744,23 @@ void Delete_Event() {
             }
         }
 
-        // if (Not_Found == false) {
-        //     break;
-        // }
-        // else {
+        if (Not_Found == false) {
+            string query_delete = "delete from management_system_tb where t_id = '"+strid+"'";
+            const char* qd = delete_query.c_str();
+            conn_state = mysql_query(connection, qd);
+
+            if (!conn_state)
+            {
+                cout << "SUCCESS: Deleted from Database." << endl;
+            }
+            else
+            {
+                cout << "FAILED TO DELETE" << mysql_error(connection) << endl;
+            }
+        }
+        else {
             cout << "Item NOT FOUND in Database." << endl;
-        // }
+        }
     }
 
     ExitMenu:
@@ -675,7 +784,7 @@ void Edit_Event() {
     system("cls");
 
     string event_Name = "";
-    string items[5000];
+    string items[100];
     char choose;
     int Item_ID;
     bool Valid_Exception = false;
@@ -688,9 +797,22 @@ void Edit_Event() {
     cout << "Management System: Instances & Cost" << endl << endl;
     cout << "Edit Events Record" << endl;
 
-    printf("---------------------------------------------------------\n");
-    printf("SQL DATABASE NOT FOUND");
-    printf("\n---------------------------------------------------------\n");
+    conn_state = mysql_query(connection, "select * from management_system_tb");
+    if (!conn_state)
+    {
+        response = mysql_storing(connection);
+        printf("---------------------------------------------------------\n");
+        printf("| %-10s | %-40s |\n", "Column Id", "Event Name");
+        while ((row = mysql_fetch_row(response)))
+        {
+            printf("| %-10s | %-40s |\n", row[0], row[1]);
+        }
+        printf("---------------------------------------------------------\n");
+    }
+    else
+    {
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
+    }
 
     try {
         cout << endl;
@@ -721,12 +843,52 @@ void Edit_Event() {
             }
         }
 
-        // if (Not_Found == false) {
-        //     break;
-        // }
-        // else {
+        if (Not_Found == false) {
+            string query_id = "select * from management_system_tb where t_id = '"+str_id+"'";
+            const char* qi = query_id.c_str();
+            conn_state = mysql_query(connection, qi);
+
+            if (!conn_state)
+            {
+                cout << endl;
+                response = mysql_storing(connection);
+                printf("---------------------------------------------------------\n");
+                printf("| %-10s | %-40s |\n", "Column Id", "Columnn Name");
+                while ((row = mysql_fetch_row(response)))
+                {
+                    printf("| %-10s | %-40s |\n", row[0], row[1]);
+                }
+                printf("---------------------------------------------------------\n");
+            }
+            else
+            {
+                cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
+            }
+
+            cin.ignore(1, '\n');
+            cout << "Enter Name of Event (xN to not change): ";
+            getline(cin, event_Name);
+            if (event_Name == "xN")
+            {
+                event_Name = store_event_Name;
+            }
+
+            string query_update = "update management_system_tb set t_trip = '"+eventName+"' where t_id = '"+str_id+"'";
+            const char* qu = query_update.c_str();
+            conn_state = mysql_query(connection, qu);
+
+            if (!conn_state)
+            {
+                cout << endl << "SUCCESS: Updated into Database" << endl;
+            }
+            else
+            {
+                cout << "FAILED TO UPDATE" << mysql_error(connection) << endl;
+            }
+
+        } else {
             cout << "Item NOT FOUND in Database." << endl;
-        // }
+        }
     }
 
     ExitMenu:
