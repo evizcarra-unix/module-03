@@ -9,6 +9,41 @@
 #include<mysql.h>
 using namespace std;
 
+
+//Global
+int conn_state;
+MYSQL* connection;
+MYSQL_ROW row;
+MYSQL_RES* response;
+
+class database_response {
+    public:
+        static void Connection_Function() {
+            connection = mysql_init(0);
+            if (connection) {
+                cout << "Connected to Database" << endl;
+                cout << "Type any key to continue..." << endl;
+                
+                system("cls");
+            }
+
+            else
+                cout << "...Connection Failed..." << mysql_error(connection) << endl;
+            connection = mysql_true_connect(connection, "localhost", "root", "", "cpp_managementSystem_database", 0, NULL, 0)
+
+            if (connection) {
+                cout << "Connected to MYSQL Database" << connection << endl;
+                cout << "Type any key to continue..." << endl;
+
+                system("cls");
+            }
+
+            else
+                cout << "...Connection Failed..." << mysql_error(connection) << endl;
+        }
+};
+
+
 //Given Functions
 void New_Event();
 void Show_Customers();
@@ -19,18 +54,15 @@ void Add_Event();
 void Delete_Event();
 void Edit_Event();
 
-//Global
-int conn_state;
-MYSQL* conn;
-MYSQL_ROW row;
-MYSQL_RES* res;
-
 int main() {
     //Load starts
     system("cls");
     system("Management System");
     system("color 0f");
     //Load ends
+
+    //Calling method to database
+    database_response::Connection_Function();
 
     int choose_Menu = 0;
     char system_shutdown;
@@ -48,6 +80,7 @@ int main() {
     cout << "9. Exit" << endl << endl;
     cin >> choose_Menu;
 
+    //Digits linked to Menu and creates ability to run per function.
     switch (choose_Menu) {
         case 1:
             New_Event();
@@ -135,15 +168,52 @@ void New_Event() {
     getline(cin, customer_email);
     cout << "Enter Date of Event: ";
     getline(cin, customer_eventDate);
-    printf("---------------------------------------------------------\n");
-    printf("SQL DATABASE NOT FOUND");
-    printf("\n---------------------------------------------------------\n");
+    conn_state = mysql_query(connection, "select * from management_system_tb");
+    if (!conn_state) {
+        response = mysql_storing(connection);
+        printf("---------------------------------------------------------\n");
+        printf("| %-10s | %-40s |\n", "Event ID", "Event Name");
+        while ((row = mysql_fetch_row(response))) {
+            printf("| %-10s | %-40s |\n", row[0], row[1]);
+            store_customer_userEvent[store_Index][store_Index2] = row[0];
+            store_Index2++;
+            store_customer_userEvent[store_Index][store_Index2] = row[1];
+            store_Index++;
+            store_Index2--;
+        }
+
+        printf("---------------------------------------------------------\n");
+    }
+
+    else {
+        cout << "Error with Querying!" << mysql_error(connection) << endl;
+    }
     
     cout << "Enter Event ID: ";
     getline(cin, customer_eventID);
+    for (int e=0, d=0, c=1; e < store_Index; i++)
+    {
+        if (store_customer_userEvent[e][d] == customer_eventID)
+        {
+            customer_userEvent = store_customer_userEvent[e][c];
+            break;
+        }
+    }
 
     cout << "Enter Instance Cost: ";
     getline(cin, customer_eventCost);
+
+    string query_insert = "enter into management_system_tb (t_customer_name, t_customer_address, t_customer_phone, t_customer_email, t_customer_eventDate, t_customer_eventID, t_customer_eventCost) values ('"+customer_name+"','"+customer_address+"','"+customer_phone+"','"+customer_email+"','"+customer_eventDate+"','"+customer_eventID+"','"+customer_eventCost+"')";
+
+    //c_str converts the string to a constant char. Very much required.
+    const char* q = query_insert.c_str();
+
+    conn_state = mysql_query(connection, q);
+    if (!conn_state) {
+        cout << endl << "Successfully added into the Database." << endl;
+    } else {
+        cout << "Error with Querying!" << mysql_error(connection) << endl;
+    }
 
     cout << "Type 'm' for Main Menu and 'a' to Enter New Customer Info again. Press any other key to exit: ";
     cin >> choose;
@@ -167,18 +237,23 @@ void Show_Customers() {
     // Initial Load End
 
     // Variables
-    string input = "";
     char choose;
     // Variables End
 
     cout << "Management System" << endl << endl;
     cout << "Show List of Customers" << endl << endl;
 
-    cin.ignore(1, '\n');
-    cout << "Enter Customer Name: ";
-    getline(cin, input);
-    
-    printf("\nDATABASE IN-DEVELOPMENT\n");
+    conn_state = mysql_query(conection, "select * from management_system_tb");
+    if (!conn_state)
+    {
+        response = mysql_storing(connection);
+        while ((row = mysql_fetch_row(response)))
+        {
+            cout << "Customer's Name: " << row[1] << "\nCustomer's Address: " << row[2] << "\nCustomer's Phone: " << row[3] << "\nCustomer's Email: " << row[4] << "\nDate of Event: " << row[5] << "\nEvent ID" << row[6] << "\nInstance's Cost: " << row[7] << endl << endl;
+        }
+    } else {
+        cout << "Erorr with Querying!" << mysql_error(connection) << endl;
+    }
 
     ExitMenu:
     cout << "Type 'm' for Main Menu and any other key to EXIT: ";
@@ -227,9 +302,19 @@ void Edit_Customer() {
     cout << "Management System: Instances & Cost" << endl << endl;
     cout << "Edit Customer Info" << endl;
 
-    printf("---------------------------------------------------------\n");
-    printf("SQL DATABASE NOT FOUND");
-    printf("\n---------------------------------------------------------\n");
+    conn_state = mysql_query(connection, "select * from management_system_tb");
+    if (!conn_state) {
+        response = mysql_storing(connection);
+        printf("---------------------------------------------------------------------------------------------------------\n");
+        printf("| %-10s | %-25s | %-25s | %-40s |\n", "Column ID", "Customer Name", "Date of Event", "Event ID");
+        while ((row = mysql_fetch_row(response)))
+        {
+            printf("| %-10s | %-25s | %-25s | %-40s |\n", row[0], row[1], row[5], row[6]);
+        }
+        printf("---------------------------------------------------------------------------------------------------------\n");
+    } else {
+        cout << "Error with Querying!" << mysql_error(connection) << endl;
+    }
 
     try {
         cout << endl;
@@ -261,12 +346,33 @@ void Edit_Customer() {
             }
         }
 
-        // if (Not_Found == false) {
-        //     break;
-        // }
-        // else {
+        if (Not_Found == false) {
+            string query_id = "select * from management_system_tb where t_id = '"+str_id+"'";
+            const char* qi = query_id.c_str();
+            conn_state = mysql_query(connection, qi);
+
+            if (!conn_state)
+            {
+                cout << endl;
+
+                response = mysql_storing(connection);
+                while ((row = mysql_fetch_row(response)))
+                {
+                    cout << "Customer's Name: " << row[1] << "\nCustomer's Address: " << row[2] << "\nCustomer's Phone: " << row[3] << "\nCustomer's Email: " << row[4] << "\nDate of Event: " << row[5] << "\nEvent ID: " << row[6] << "\nInstance Cost: " << row[7] << endl << endl;
+                    store_ColumnID = row[0];
+                    store_Customer = row[1];
+                    store_Address = row[2];
+                    store_Phone = row[3];
+                    store_Email = row[4];
+                    store_eventDate = row[5];
+                    store_Event = row[6];
+                    store_Cost = row[7];
+                }
+            }
+        }
+        else {
             cout << "Item NOT FOUND in Database." << endl;
-        // }
+        }
     }
 
     ExitMenu:
