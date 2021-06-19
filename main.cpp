@@ -186,16 +186,16 @@ void New_Event() {
     }
 
     else {
-        cout << "Error with Querying!" << mysql_error(connection) << endl;
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
     }
     
     cout << "Enter Event ID: ";
     getline(cin, customer_eventID);
-    for (int e=0, d=0, c=1; e < store_Index; i++)
+    for (int i=0, j=0, k=1; e < store_Index; i++)
     {
-        if (store_customer_userEvent[e][d] == customer_eventID)
+        if (store_customer_userEvent[i][j] == customer_eventID)
         {
-            customer_userEvent = store_customer_userEvent[e][c];
+            customer_userEvent = store_customer_userEvent[i][k];
             break;
         }
     }
@@ -212,7 +212,7 @@ void New_Event() {
     if (!conn_state) {
         cout << endl << "Successfully added into the Database." << endl;
     } else {
-        cout << "Error with Querying!" << mysql_error(connection) << endl;
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
     }
 
     cout << "Type 'm' for Main Menu and 'a' to Enter New Customer Info again. Press any other key to exit: ";
@@ -252,7 +252,7 @@ void Show_Customers() {
             cout << "Customer's Name: " << row[1] << "\nCustomer's Address: " << row[2] << "\nCustomer's Phone: " << row[3] << "\nCustomer's Email: " << row[4] << "\nDate of Event: " << row[5] << "\nEvent ID" << row[6] << "\nInstance's Cost: " << row[7] << endl << endl;
         }
     } else {
-        cout << "Erorr with Querying!" << mysql_error(connection) << endl;
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
     }
 
     ExitMenu:
@@ -294,6 +294,7 @@ void Edit_Customer() {
     string store_Phone = "";
     string store_Email = "";
     string store_eventDate = "";
+    string store_eventID = "";
     string store_Event = "";
     string store_Cost = "";
     string store_Event2d[100][100];
@@ -313,7 +314,7 @@ void Edit_Customer() {
         }
         printf("---------------------------------------------------------------------------------------------------------\n");
     } else {
-        cout << "Error with Querying!" << mysql_error(connection) << endl;
+        cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
     }
 
     try {
@@ -330,13 +331,13 @@ void Edit_Customer() {
 
     if (Valid_Exception == false) {
         stringstream streamid;
-        string strid;
+        string str_id;
         streamid << Item_ID;
-        streamid >> strid;
+        streamid >> str_id;
 
         for (int i = 0; i < index_ID; i++)
         {
-            if (strid != items[i])
+            if (str_id != items[i])
             {
                 Not_Found = true;
             }else
@@ -368,11 +369,85 @@ void Edit_Customer() {
                     store_Event = row[6];
                     store_Cost = row[7];
                 }
+            } else {
+                cout << "Item NOT FOUND in Database." << mysql_error(connection) << endl;
             }
-        }
-        else {
-            cout << "Item NOT FOUND in Database." << endl;
-        }
+            
+            cin.ignore(1, '\n');
+            cout << "Enter Customer Name (x to skip): ";
+            getline(cin, customer_name);
+            if (customer_name == "x") {
+                customer_name = store_Customer;
+            }
+
+            cout << "Enter Customer Address (x to skip): ";
+            getline(cin, customer_address);
+            if (customer_address == "x") {
+                customer_address = store_Address;
+            }
+
+            cout << "Enter Customer Phone (x to skip): ";
+            getline(cin, customer_phone);
+            if (customer_phone == "x") {
+                customer_phone = store_Phone;
+            }
+
+            cout << "Enter Email (x to skip): ";
+            getline(cin, customer_email);
+            if (customer_email == "x") {
+                customer_email = store_Email;
+            }
+
+            cout << "Enter Date of Event (x to skip): ";
+            getline(cin, customer_eventDate);
+            if (customer_eventDate == "x") {
+                customer_eventDate = store_eventDate;
+            }
+
+            conn_state = mysql_query(connection, "select * from management_system_tb");
+            if (!conn_state) {
+                response = mysql_storing(connection);
+                printf("---------------------------------------------------------\n");
+                printf("| %-10s | %-40s |\n", "Event ID", "Event");
+                while ((row = mysql_fetch_row(response)))
+                {
+                    printf("| %-10s | %-40s |\n", row[0], row[1]);
+                    store_Event2d[store_Index][store_Index2] = row[0];
+                    store_Index++;
+                    store_Event2d[store_Index][store_Index2] = row[1];
+                    store_Index++;
+                    store_Index2--;
+                }
+                printf("---------------------------------------------------------\n");
+            } else {
+                cout << "Item NOT FOUND in Database" << mysql_error(connection) << endl;
+            }
+
+            cin.ignore(1, '\n');
+            cout << "Enter Event ID (x to skip): ";
+            getline(cin, customer_eventID);
+            if (customer_eventID == "x") {
+                customer_userEvent = store_Event;
+            } else {
+                for (int i=0, j=0, k=1; i < store_Index; i++)
+                {
+                    if (store_Event2d[i][j] == customer_eventID)
+                    {
+                        customer_userEvent = store_Event2d[i][k];
+                        break;
+                    }
+                }
+            }
+
+            cout << "Enter Instance Cost (x to skip): ";
+            getline(cin, customer_eventCost);
+            if (customer_eventCost == "x")
+            {
+                customer_eventCost = store_Cost;
+            }
+
+            string query_update = "update management_system_tb set t_customer_name = '"+customer_name+"', t_customer_address = '"+customer_address+"', t_customer_phone = '"+customer_phone+"', t_customer_email = '"+customer_email+"', t_customer_eventDate = '"+customer_eventDate+"', t_customer_eventID = '"+customer_eventID+"', t_customer_eventCost = '"+customer_eventCost+"', where t_id = '"+str_id+"'";
+        }   
     }
 
     ExitMenu:
