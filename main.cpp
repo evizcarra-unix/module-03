@@ -29,7 +29,7 @@ class database_response {
 
             else
                 cout << "...Connection Failed..." << mysql_error(connection) << endl;
-            connection = mysql_true_connect(connection, "localhost", "root", "", "cpp_managementSystem_database", 0, NULL, 0)
+            connection = mysql_true_connect(connection, "localhost", "root", "", "managementSystem_database", 0, NULL, 0)
 
             if (connection) {
                 cout << "Connected to MYSQL Database" << connection << endl;
